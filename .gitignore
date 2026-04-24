@@ -1,0 +1,46 @@
+# ─── Python ─────────────────────────────────
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+dist/
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+
+# ─── Virtual envs ───────────────────────────
+venv/
+env/
+.venv/
+ENV/
+
+# ─── Secrets ────────────────────────────────
+.env
+.env.local
+.env.*.local
+credentials.json
+token.pickle
+*.key
+*.pem
+
+# ─── Database / state ───────────────────────
+*.db
+*.sqlite
+*.sqlite3
+tria.db
+
+# ─── Logs ───────────────────────────────────
+logs/
+*.log
+
+# ─── OS ─────────────────────────────────────
+.DS_Store
+Thumbs.db
+
+# ─── IDE ────────────────────────────────────
+.vscode/
+.idea/
+*.swp
+*.swo

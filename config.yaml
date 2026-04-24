@@ -1,0 +1,39 @@
+# ─── Tria tenant configuration ──────────────
+tenant: marco
+
+source:
+  type: gmail
+  lookback_hours: 3
+  max_emails_per_run: 50
+
+classifier:
+  type: gemini
+  model: gemini-2.5-flash
+
+output:
+  type: obsidian
+  folder: 04-Daily notes/Emails
+  filename_format: "{date}.md"   # YYYY-MM-DD — appendado por run
+  append: true
+
+categories:
+  - id: important
+    emoji: "🔴"
+    label: Importante
+    description: "Banco, trabalho, pessoa real, cobrança, transação financeira, boleto, extrato"
+  - id: read_later
+    emoji: "🟡"
+    label: Pra ler
+    description: "Newsletter, notificação de app, blog, curso, produto SaaS que eu uso"
+  - id: spam
+    emoji: "⚫"
+    label: Spam / Lixo
+    description: "Promoção comercial, phishing, marketing desconhecido, scam, cupom"
+
+privacy:
+  send_body: false               # Envia só metadata (sender + subject + snippet)
+  snippet_chars: 300
+  redact_patterns:
+    - '\b\d{3}\.\d{3}\.\d{3}-\d{2}\b'          # CPF
+    - '\b\d{2}\.\d{3}\.\d{3}/\d{4}-\d{2}\b'    # CNPJ
+    - '\b\d{4}\s?\d{4}\s?\d{4}\s?\d{4}\b'      # Cartão
