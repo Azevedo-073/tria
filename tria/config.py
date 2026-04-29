@@ -20,6 +20,8 @@ class SourceConfig:
     type: str
     lookback_hours: int = 3
     max_emails_per_run: int = 50
+    apply_labels: bool = False           # Aplica labels Tria/{categoria} no Gmail
+    label_prefix: str = "Tria"           # Prefixo das labels (ex: "Tria/Importante")
 
 
 @dataclass
@@ -35,6 +37,9 @@ class OutputConfig:
     folder: str
     filename_format: str
     append: bool = True
+    write_canvas: bool = True                         # Gera .canvas kanban junto
+    canvas_filename: str = "📧 Tria Kanban.canvas"    # Nome fixo = dashboard vivo
+                                                      # (use "{date}.canvas" pra histórico por dia)
 
 
 @dataclass

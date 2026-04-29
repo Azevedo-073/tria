@@ -11,6 +11,9 @@ from ..config import CategoryConfig
 class Classification:
     category_id: str
     reasoning: str          # Short one-liner explaining the decision
+    success: bool = True    # False = classification failed; pipeline should skip
+                            # the email (no db save, no label, no digest entry)
+                            # so the next run retries from scratch.
 
 
 class Classifier(ABC):

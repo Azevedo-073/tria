@@ -43,6 +43,8 @@ def build_output(cfg: Config) -> Output:
             folder=cfg.output.folder,
             filename_format=cfg.output.filename_format,
             append=cfg.output.append,
+            write_canvas=cfg.output.write_canvas,
+            canvas_filename=cfg.output.canvas_filename,
         )
     raise ValueError(f"Unknown output type: {cfg.output.type}")
 
@@ -71,9 +73,26 @@ def run_once(cfg: Config, db_path: str = "tria.db") -> dict:
         if skipped:
             logger.info("Skipping %d already-processed emails.", skipped)
 
+        # Map category_id → label.label pra montar "Tria/{Categoria}"
+        cat_by_id = {c.id: c for c in cfg.categories}
+
         triaged: List[TriagedEmail] = []
+        skipped_failures = 0
         for email in fresh:
             classification = classifier.classify(email, cfg.categories)
+
+            # Falha persistente — NÃO salva, NÃO aplica label, NÃO entra no digest.
+            # Próxima run re-tenta do zero (sem registro no SQLite = não dedupa).
+            if not classification.success:
+                skipped_failures += 1
+                logger.warning(
+                    "  [SKIP] %s — %s — %s",
+                    email.subject[:60],
+                    email.sender[:40],
+                    classification.reasoning,
+                )
+                continue
+
             db.save_classification(
                 conn,
                 run_id=run_id,
@@ -94,6 +113,20 @@ def run_once(cfg: Config, db_path: str = "tria.db") -> dict:
                 email.sender[:40],
             )
 
+            # Aplica label no Gmail (se habilitado e source suportar)
+            if cfg.source.apply_labels and hasattr(source, "apply_label"):
+                cat = cat_by_id.get(classification.category_id)
+                if cat:
+                    label_name = f"{cfg.source.label_prefix}/{cat.label}"
+                    try:
+                        source.apply_label(email.message_id, label_name)
+                        logger.info("    ↳ label applied: %s", label_name)
+                    except Exception as exc:
+                        # Não falha o pipeline por causa de label — só loga
+                        logger.warning(
+                            "    ↳ failed to apply label %s: %s", label_name, exc
+                        )
+
         if triaged:
             logger.info("Writing digest to Obsidian...")
             output.write_digest(triaged, cfg.categories)
@@ -113,6 +146,7 @@ def run_once(cfg: Config, db_path: str = "tria.db") -> dict:
             "fetched": len(emails),
             "classified": len(triaged),
             "skipped": skipped,
+            "failed": skipped_failures,
             "status": "success",
         }
     except Exception as e:

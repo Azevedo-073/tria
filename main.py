@@ -40,10 +40,11 @@ def run(config_path: str, db_path: str, verbose: bool):
     summary = run_once(cfg, db_path=db_path)
 
     log.info(
-        "━━━ Done. Fetched=%d · Classified=%d · Skipped=%d · Status=%s ━━━",
+        "━━━ Done. Fetched=%d · Classified=%d · Skipped=%d · Failed=%d · Status=%s ━━━",
         summary["fetched"],
         summary["classified"],
         summary["skipped"],
+        summary.get("failed", 0),
         summary["status"],
     )
 

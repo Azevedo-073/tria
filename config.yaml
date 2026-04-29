@@ -5,16 +5,21 @@ source:
   type: gmail
   lookback_hours: 3
   max_emails_per_run: 50
+  apply_labels: true                # Aplica label Tria/{categoria} no Gmail
+  label_prefix: "Tria"              # Prefixo (Tria/Importante, Tria/Pra ler, Tria/Lixo)
 
 classifier:
   type: gemini
   model: gemini-2.5-flash
+  temperature: 0.2
 
 output:
   type: obsidian
   folder: 04-Daily notes/Emails
-  filename_format: "{date}.md"   # YYYY-MM-DD — appendado por run
+  filename_format: "{date}.md"           # Markdown: 1 por dia, append por run (histórico)
   append: true
+  write_canvas: true                     # Gera kanban .canvas junto
+  canvas_filename: "📧 Tria Kanban.canvas"   # Fixo = dashboard vivo (use "{date}.canvas" pra histórico)
 
 categories:
   - id: important
