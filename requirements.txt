@@ -7,3 +7,6 @@ pyyaml>=6.0
 requests>=2.31.0
 click>=8.1.7
 python-dotenv>=1.0.0
+
+# Dev / test
+pytest>=8.0.0
